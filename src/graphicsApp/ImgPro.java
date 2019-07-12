@@ -8,6 +8,7 @@ public class ImgPro
 {
 	public static BufferedImage rescale(BufferedImage img,double x_scale,double y_scale)
 	{
+		System.out.println((int)(img.getWidth()*x_scale));
 		BufferedImage output=new BufferedImage((int)(img.getWidth()*x_scale),(int)(img.getHeight()*y_scale),img.getType());
 		Graphics2D g2=output.createGraphics();
 		g2.drawImage(img, 0, 0, output.getWidth(), output.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);

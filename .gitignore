@@ -1,3 +1,11 @@
 
 *.class
 .DS_Store
+/flash32.png
+/flash512.png
+/gray.png
+/green.png
+/heal.png
+/input.txt
+/input2.txt
+/yellow.png
