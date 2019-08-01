@@ -1,8 +1,14 @@
 package graphicsApp;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,6 +43,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
 import org.xml.sax.SAXException;
+
+import graphicsUtil.Point;
+import graphicsUtil.Vector;
 
 
 public class GraphicsApp 
@@ -104,9 +113,96 @@ public class GraphicsApp
 	{
 		ImageIO.write(image, "png", new File(filename));
 	}
+	public static Point[] sampleArc(Point end,Point start,double distance,int nPoints)
+	{
+		if(nPoints<=0)
+		{
+			System.out.println("the point require is at least one");
+			return null;
+		}
+		Point[] output=new Point[nPoints];
+		if(nPoints==1)
+		{
+			output[0]=start;
+			return output;
+		}
+		if(nPoints==2)
+		{
+			output[0]=start;
+			output[1]=end;
+			return output;
+		}
+		Point center=end.AffineCom(start, 0.5).sum(end.distance(start).unitVec().rotate(Math.PI/2).scaler(distance));
+		double angle=end.distance(center).angle(start.distance(center));
+		Vector r=start.distance(center);
+		for(int i=0;i<nPoints;i++)
+		{
+			output[i]=center.sum(r.rotate(angle*i/(nPoints-1)));
+		}
+		return output;
+	}
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, TransformerException, TranscoderException 
     {
+    	SVGGraphics2D g=makeSVGGraphics();
     	
+        BasicStroke stroke = new BasicStroke(5);
+        
+    	int nPoints=6;
+    	int[] xPoints=new int[nPoints];
+    	int[] yPoints=new int[nPoints];
+    	xPoints[0]=-10;
+    	xPoints[1]=384;
+    	xPoints[2]=600;
+    	xPoints[3]=600;
+    	xPoints[4]=384;
+    	xPoints[5]=-10;
+    	yPoints[0]=160;
+    	yPoints[1]=160;
+    	yPoints[2]=128;
+    	yPoints[3]=384;
+    	yPoints[4]=352;
+    	yPoints[5]=352;
+    	
+    	/*
+    	Point[] upper=sampleArc(new Point(200,100),new Point(0,100),100,nPoints/2+1);
+    	Point[]lower=sampleArc(new Point(0,100),new Point(200,100),100,nPoints/2+1);
+    	for(int i=0;i<upper.length;i++)
+    	{
+    		xPoints[i]=(int)Math.round(upper[i].x);
+    		yPoints[i]=(int)Math.round(upper[i].y);
+    	}
+    	for(int i=0;i<upper.length-1;i++)
+    	{
+    		xPoints[i+upper.length-1]=(int)Math.round(lower[i].x);
+    		yPoints[i+upper.length-1]=(int)Math.round(lower[i].y);
+    	}
+    	//inputPolygon
+    	 */
+        g.setColor(new Color(249,249,249));
+        g.fillRect(0, 0, 512, 512);
+    	g.setColor(new Color(132,255,252));
+    	g.fillPolygon(xPoints, yPoints, nPoints);
+    	g.setColor(Color.white);
+    	g.setStroke(new BasicStroke(5));
+    	g.drawPolygon(xPoints, yPoints, nPoints);
+    	g.drawLine(64, 300, 264, 300);
+    	g.drawLine(210, 251, 420, 251);
+    	g.drawLine(116, 200, 300, 200);
+    	
+    	//write
+    	writeSVGgraphics(new OutputStreamWriter(new FileOutputStream(new File("test.svg"))),g,512,512);
+    	SVGDocument doc=readSVG("test.svg");
+    	rescaleSVG(512, 512, doc);
+    	SVGDocToPNG(doc,"test.png");
+    	/*
+    	Point[] samplePts=sampleArc(new Point(-1,0),new Point(1,0),1,5);
+    	for(int i=0;i<samplePts.length;i++)
+    	{
+    		System.out.print("Point "+i+": ");
+    		samplePts[i].print();
+    	}
+    	*/
+    	/*
     	SVGGraphics2D g=makeSVGGraphics();
     	g.setColor(new Color(255,174,201));
     	g.fillRect(0, 0, 512, 512);
@@ -114,7 +210,7 @@ public class GraphicsApp
     	g.fillRect(192, 32, 128, 448);
     	g.fillRect(32, 192, 448, 128);
     	writeSVGgraphics(new OutputStreamWriter(new FileOutputStream(new File("test.svg")),"UTF-8"),g,512,512);
-        
+        */
     	/*
     	SVGDocument doc=readSVG("test.svg");
     	rescaleSVG(32,32,doc);
