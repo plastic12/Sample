@@ -1,4 +1,4 @@
-package myUtility;
+package tool;
 import java.util.Scanner;
 
 public class ConsoleUtility

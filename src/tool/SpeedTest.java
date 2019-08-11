@@ -1,4 +1,4 @@
-package myUtility;
+package tool;
 
 public class SpeedTest 
 {
